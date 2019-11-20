@@ -1,2 +1,2 @@
 # AlgoC
-Polytech
+Polytech MTP
