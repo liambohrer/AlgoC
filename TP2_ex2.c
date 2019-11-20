@@ -21,8 +21,7 @@ int main(void)
 	for(int j = 0 ; c[j] != '\n' ; j++){
 		c_int[j] = c[j] - 48;
 		printf("%d",c_int[j]);
-	}c_int[j] = c[j] - 48;
-		printf("%d",c_int[j]);
+	}
 	printf("\n");
 
 }
