@@ -3,7 +3,7 @@
 #include <time.h>
 
 int x = 30, y = 50;
-int pourcentageObstacles = 20;
+int pourcentageObstacles = 10;
 
 void initNull(char tabC[x][y], int tabI[x][y]);
 void showTabChar(char tabC[x][y]);
@@ -12,6 +12,7 @@ void updateTab(char tabC[x][y], int tabI[x][y]);
 void addObstacles(int tabI[x][y]);
 void addEndAndStart(int tabI[x][y], int* xs, int* xe, int* ys, int* ye);
 void addBorder(int tabI[x][y]);
+int findTheWayMyFriend(int tab[x][y], int x, int y, int count);
 
 int main(int argc, char const *argv[]) {
 
@@ -26,7 +27,7 @@ int main(int argc, char const *argv[]) {
   int tabI[x][y];
   char tabC[x][y];
 
-  int xStart, yStart, xEnd, yEnd;  
+  int xStart = 0, yStart = 0, xEnd = 0, yEnd = 0, ret = 0;  
 
 
 
@@ -41,6 +42,7 @@ int main(int argc, char const *argv[]) {
   updateTab(tabC, tabI);
   //showTabInt(tabI);
   showTabChar(tabC);
+  ret = findTheWayMyFriend(tabI, xStart, xEnd, 1);
   
 
 
@@ -57,6 +59,10 @@ int main(int argc, char const *argv[]) {
 
   printf("\nLe point de départ est à la ligne %d colonne %d\n", xStart+1, yStart+1);
   printf("Le point d'arrivée est à la ligne %d colonne %d\n", xEnd+1, yEnd+1);
+
+  printf("C'est ok ? %d\n\n", ret);
+  updateTab(tabC, tabI);
+  showTabChar(tabC);
 
   return 0;
 }
@@ -100,9 +106,12 @@ void updateTab(char tabC[x][y], int tabI[x][y]){
         case 1 : 
           tabC[i][j] = 'D';
           break;
+        
+        case 0:
+          break;
 
-        default :
-          tabC[i][j] = ' ';
+        default:
+          tabC[i][j] = '.';
           break;
       }
     }
@@ -150,7 +159,48 @@ void initNull(char tabC[x][y], int tabI[x][y]){
   for (int i = 1; i < x-1; i++) {
     for (int j = 1; j < y-1; j++) {
       tabI[i][j] = 0;  
-      tabC[i][j] = '.';  
+      tabC[i][j] = ' ';  
     }
   }
+}
+
+
+
+int findTheWayMyFriend(int tab[x][y], int x, int y, int count){
+  int ret = 0;
+  if (tab[x][y] != -1){
+    if (tab[x+1][y] == 0){
+      tab[x+1][y] = count+1;
+      ret = findTheWayMyFriend(tab, x+1, y, count+1);
+      if (ret == 1)
+      {
+        return ret;
+      }
+    }
+    if (tab[x-1][y] == 0){
+      tab[x-1][y] = count+1;
+      ret = findTheWayMyFriend(tab, x-1, y, count+1);
+      if (ret == 1)
+      {
+        return ret;
+      }
+    }
+    if (tab[x][y-1] == 0){
+      tab[x][y-1] = count+1;
+      ret = findTheWayMyFriend(tab, x, y-1, count+1);
+      if (ret == 1)
+      {
+        return ret;
+      }
+    }
+    if (tab[x][y+1] == 0){
+      tab[x][y+1] = count+1;
+      ret = findTheWayMyFriend(tab, x, y+1, count+1);
+      if (ret == 1)
+      {
+        return ret;
+      }
+    }
+  }
+  return (tab[x][y] == -2) ? 1:0;
 }
