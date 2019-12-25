@@ -3,7 +3,7 @@
 #include <time.h>
 
 int x = 50, y = 100;
-int pourcentageObstacles = 30;
+int pourcentageObstacles = 35;
 
 void initNull(char tabC[x][y], int tabI[x][y]);
 void showTabChar(char tabC[x][y]);
@@ -43,7 +43,6 @@ int main(int argc, char const *argv[]) {
   //showTabInt(tabI);
   showTabChar(tabC);
   ret = findTheWayMyFriend(tabI, &xEndFound, &yEndFound);
-  ret = goToHome(tabI, &xStartFound, &yStartFound);
   
 
 
@@ -61,9 +60,23 @@ int main(int argc, char const *argv[]) {
   printf("\nLe point de départ est à la ligne %d colonne %d\n", xStart+1, yStart+1);
   printf("Le point d'arrivée est à la ligne %d colonne %d\n", xEnd+1, yEnd+1);
 
-  printf("C'est ok ? %d xe = %d, ye = %d\n\n", ret, xEndFound+1, yEndFound+1);
+  ret = goToHome(tabI, &xStartFound, &yStartFound);
   updateTab(tabC, tabI);
   showTabChar(tabC);
+  
+  if (ret != -1){
+    printf("L'arrivée a été trouvée à la ligne %d colonne %d\n", xEndFound+1, yEndFound+1);
+  }else{
+    printf("L'arrivée n'a pas été trouvée ...\n");
+  }
+  
+  
+  if (ret != -1){
+    printf("La distance du chemin de retour est de %d case%c\n", ret, (ret <= 1)?' ':'s');
+  }else{
+    printf("Il y a donc pas de chemin de retour ...\n");
+  }
+  
   return 0;
 }
 
