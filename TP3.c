@@ -15,6 +15,15 @@ void addBorder(int tabI[x][y]);
 int findTheWayMyFriend(int tab[x][y], int* xe, int* ye);
 int goToHome(int tab[x][y], int* xs, int* ys);
 
+int Controleur(int tab[x][y], int pile[256][3]);
+int findTheWayMyFriendButStockThemInAPile(int tab[x][y], int pile[256][3], int* xToCheck, int* yToCheck, int count);
+int checkAroundYou(int tab[x][y], int pile[256][3], int xToCheck, int yToCheck, int count);
+
+
+void empile(int x, int y, int count, int pile[256][3]);
+void depile(int* x, int* y, int* count, int pile[256][3]);
+int isPileEmpty(int pile[256][3]);
+
 int main(int argc, char const *argv[]) {
 
 
@@ -29,7 +38,7 @@ int main(int argc, char const *argv[]) {
   char tabC[x][y];
 
   int xStart = 0, yStart = 0, xEnd = 0, yEnd = 0, ret = 0, xEndFound = 0, yEndFound = 0, xStartFound = 0, yStartFound = 0;
-
+  int pile[256][3] = {-1};
 
 // ------------------- MAIN ------------------- //
 
@@ -43,7 +52,7 @@ int main(int argc, char const *argv[]) {
   //showTabInt(tabI);
   showTabChar(tabC);
   ret = findTheWayMyFriend(tabI, &xEndFound, &yEndFound);
-  
+  //ret = Controleur(tabI, pile);
 
 
 // ------------------- AFFICHAGE ------------------- //
@@ -121,7 +130,7 @@ void updateTab(char tabC[x][y], int tabI[x][y]){
           break;
 
         case (-1) :
-          tabC[i][j] = '#';
+          tabC[i][j] = '0';
           break;
         
         case -2 : 
@@ -129,7 +138,7 @@ void updateTab(char tabC[x][y], int tabI[x][y]){
           break;
       
         case -3 : 
-          tabC[i][j] = '0';
+          tabC[i][j] = '#';
           break;
         
         default:
@@ -178,7 +187,6 @@ void addBorder(int tabI[x][y]){
 
 
 
-
 void initNull(char tabC[x][y], int tabI[x][y]){
   for (int i = 1; i < x-1; i++) {
     for (int j = 1; j < y-1; j++) {
@@ -190,6 +198,73 @@ void initNull(char tabC[x][y], int tabI[x][y]){
 
 
 
+int Controleur(int tab[x][y], int pile[256][3]){
+  int count = 1, xToCheck = 1, yToCheck = 1, ret = 0;
+  for (; (xToCheck < x-1) && (tab[xToCheck][yToCheck] != 1); xToCheck++){
+    for (; (yToCheck < y-1) && (tab[xToCheck][yToCheck] != 1); yToCheck++);    
+  }
+  empile(xToCheck, yToCheck, count, pile);
+  while (!isPileEmpty || ret != 1){
+    depile(&xToCheck, &yToCheck, &count, pile);
+    ret = findTheWayMyFriendButStockThemInAPile(tab, pile, &xToCheck, &yToCheck, count+1);
+  }
+}
+
+
+
+int findTheWayMyFriendButStockThemInAPile(int tab[x][y], int pile[256][3], int* xToCheck, int* yToCheck, int count){
+  int ret = 0, retNow;
+
+  &xToCheck + 1;
+  retNow = checkAroundYou(tab, pile, *xToCheck, *yToCheck, count);
+  ret = retNow;
+  if (ret){
+    return ret;
+  }else if(ret == 0){
+    empile(*xToCheck, *yToCheck, count, pile);
+  }
+  
+  &xToCheck - 2;
+  retNow = checkAroundYou(tab, pile, *xToCheck, *yToCheck, count);
+  ret = (ret == 0) ? 0 : retNow;
+  if (ret){
+    return ret;
+  }else if(ret == 0){
+    empile(*xToCheck, *yToCheck, count, pile);
+  }
+  
+  &xToCheck + 1;
+  &yToCheck - 1;
+  retNow = checkAroundYou(tab, pile, *xToCheck, *yToCheck, count);
+  ret = (ret == 0) ? 0 : retNow;
+  if (ret){
+    return ret;
+  }else if(ret == 0){
+    empile(*xToCheck, *yToCheck, count, pile);
+  }
+  
+  &yToCheck + 2;
+  retNow = checkAroundYou(tab, pile, *xToCheck, *yToCheck, count);
+  ret = (ret == 0) ? 0 : retNow;
+  if (ret){
+    return ret;
+  }else if(ret == 0){
+    empile(*xToCheck, *yToCheck, count, pile);
+  }
+    
+  &yToCheck - 1;
+  return ret;
+}
+
+int checkAroundYou(int tab[x][y], int pile[256][3], int xToCheck, int yToCheck, int count){
+  if (tab[xToCheck][yToCheck] == 0){
+    tab[xToCheck][yToCheck] = count;
+    return 0;
+  }else if (tab[xToCheck][yToCheck] == -2){
+    return 1;
+  }else return -1;
+}
+
 int findTheWayMyFriend(int tab[x][y], int* xe, int* ye){
   int count = 0, ret = 0;
   while (ret == 0){
@@ -198,7 +273,6 @@ int findTheWayMyFriend(int tab[x][y], int* xe, int* ye){
     for (int i = 1; i < x-1 && ret != 1; i++){
       for (int j = 1; j < y-1 && ret != 1; j++){
         if (tab[i][j] == count){
-
           if (tab[i+1][j] == 0){
             tab[i+1][j] = count+1;
             ret = 0;
@@ -214,28 +288,11 @@ int findTheWayMyFriend(int tab[x][y], int* xe, int* ye){
           if (tab[i][j+1] == 0){
             tab[i][j+1] = count+1;
             ret = 0;
-          }          
-
-          if (tab[i+1][j] == -2){
-            *xe = i+1;
+          }
+        }else if(tab[i][j] == -2){
+            *xe = i;
             *ye = j;
             ret = 1;
-          }
-          else if (tab[i-1][j] == -2){
-            *xe = i-1;
-            *ye = j;
-            ret = 1;
-          }
-          else if (tab[i][j-1] == -2){
-            *xe = i;
-            *ye = j-1;
-            ret = 1;
-          }
-          else if (tab[i][j+1] == -2){
-            *xe = i;
-            *ye = j+1;
-            ret = 1;
-          }
         }
       }
     }
@@ -300,4 +357,28 @@ int goToHome(int tab[x][y], int* xs, int* ys){
     }
   }
   return ret;
+}
+
+void empile(int xToStore, int yToStore, int count, int pile[256][3]){
+  int i = 0;
+  for (; pile[i][0] != -1; i++);
+  pile[i][0] = xToStore;
+  pile[i][1] = yToStore;
+  pile[i][2] = count;
+}
+
+void depile(int* xToGet, int* yToGet, int* count, int pile[256][3]){
+  *xToGet = pile[0][0];
+  *yToGet = pile[0][1];
+  *count = pile[0][2];
+
+  for (int i = 1; pile[i][0] != -1; i++){
+    pile[i-1][0] = pile[i][0];
+    pile[i-1][1] = pile[i][1];
+    pile[i-1][2] = pile[i][2];
+  }
+}
+
+int isPileEmpty(int pile[256][3]){
+ return (pile[0][0] == -1) ? 1 : 0;
 }
