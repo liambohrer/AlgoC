@@ -21,69 +21,163 @@ int main(){
   //printf("Entrer une phrase : ");
   //scanf("%50[^\n]", str);
 
-  char d;
-  int init = 0;
+  char d, c;
+  int init = 0, stop = 0;
+
   do{
-    if (init) {
-      printf("Le nom de votre fichier n'est pas correct \n");
+
+    init = 0;
+
+    do{
+      printf("Voulez-vous traiter un fichier ou une phrase (f/p) ? ");
+      scanf("%c", &c);
+      while((d = getchar()) != '\n' && d != EOF);
+    } while (c != 'f' && c != 'p');
+
+    if (c == 'f'){
+      do{
+        if (init) {
+          printf("Le nom de votre fichier n'est pas correct \n");
+        }
+        printf("Entrer le nom de votre fichier : ");
+        scanf("%s", str);
+        while((d = getchar()) != '\n' && d != EOF);
+        init = 1;
+      }while ((in = fopen(str, "r")) == NULL);
+
+      init = 0;
+      do {
+        if (init) {
+          printf("Réponse incorrecte \n");
+        }
+        printf("Voulez-vous encripter ou décripter votre fichier (e/d) ? ");
+        scanf("%c", &c);
+        while((d = getchar()) != '\n' && d != EOF);
+        init = 1;
+      } while(c != 'e' && c != 'd');
+
+      if (c == 'e') {
+        if ((out = fopen("EncryptedFile", "w")) == NULL) {
+          printf("Erreur création du fichier !");
+          return -1;
+        }
+      } else if (c == 'd') {
+        if ((out = fopen("DecryptedFile", "w")) == NULL) {
+          printf("Erreur création du fichier !");
+          return -1;
+        }
+      } else {
+        printf("Erreur de saisie\n");
+        return -1;
+      }
+
+      init = 0;
+      int met = 1;
+      do {
+        if (init) {
+          printf("Cette méthode n'existe pas !\n");
+        }
+        printf("Quelle méthode voulez-vous utiliser ? (1, 2 ou 3) : ");
+        scanf("%d", &met);
+        while((d = getchar()) != '\n' && d != EOF);
+        init = 1;
+      } while(met < 1 || met > 3);
+
+      if (c == 'e') {
+        EncryptFile(in, out, met);
+      } else if (c == 'd') {
+        DecryptFile(in, out, met);
+      } else {
+        printf("Erreur de saisie\n");
+        return -1;
+      }        
+    
+      fclose(in);
+      fclose(out);
+    }else{
+      printf("Entrer votre phrase : ");
+      scanf("%50[^\n]", str);    
+      while((d = getchar()) != '\n' && d != EOF);
+
+      init = 0;
+      int met = 1;
+      do {
+        if (init) {
+          printf("Cette méthode n'existe pas !\n");
+        }
+        printf("Quelle méthode voulez-vous utiliser ? (1, 2 ou 3) : ");
+        scanf("%d", &met);
+        while((d = getchar()) != '\n' && d != EOF);
+        init = 1;
+      } while(met < 1 || met > 3);
+
+      int num; 
+      char cle[26], lut[][26] = {"abcdefghijklmnopqrstuvwxyz", {'\0'}};       
+      switch (met){
+        case 1 :
+          EncryptLigne1(str);
+          break;
+        
+        case 2 :
+          printf("Entrer un nombre entre 0 et 25 : ");
+          scanf("%d", &num);
+          while((d = getchar()) != '\n' && d != EOF);
+          EncryptLigne2(str,num);
+          break;
+        
+        case 3 :
+          printf("\nEntrer votre clef secrète : ");
+          scanf("%s", cle);
+          while((d = getchar()) != '\n' && d != EOF);
+          LUT(lut,cle);
+          AfficheLUT(lut);
+          EncryptLigne3(str,cle);
+          break;
+        
+        default:
+          break;
+      }
+
+      printf("Phare encriptée : %s", str);
+
+      printf("\nVoulez-vous la décriptée (o/n) ? ");
+
+      do{
+        scanf("%c", &c);
+        while((d = getchar()) != '\n' && d != EOF);
+      } while(c != 'o' && c != 'n');
+      if (c == 'o'){
+        switch (met){
+          case 1 :
+            DecryptLigne1(str);
+            break;
+          
+          case 2 :
+            DecryptLigne2(str,num);
+            break;
+          
+          case 3 :
+            DecryptLigne3(str,cle);
+            break;
+          
+          default:
+            break;
+        }
+        printf("Phare decriptée : %s", str);
+      }
     }
-    printf("Entrer le nom de votre fichier : ");
-    scanf("%s", str);
-    while((d = getchar()) != '\n' && d != EOF);
-    init = 1;
-  }while ((in = fopen(str, "r")) == NULL);
 
-  init = 0;
-  char c;
-  do {
-    if (init) {
-      printf("Réponse incorrecte \n");
+    printf("\nVoulez-vous continuer (o/n) ? ");
+    do{
+      scanf("%c", &c);
+      while((d = getchar()) != '\n' && d != EOF);
+    } while(c != 'o' && c != 'n');
+    if (c == 'o'){
+      stop = 0;
+    }else{
+      stop = 1;
     }
-    printf("Voulez-vous encripter ou décripter votre fichier ? (e/d) \n");
-    scanf("%c", &c);
-    while((d = getchar()) != '\n' && d != EOF);
-    init = 1;
-  } while(c != 'e' && c != 'd');
-
-  if (c == 'e') {
-    if ((out = fopen("EncryptedFile", "w")) == NULL) {
-      printf("Erreur création du fichier !");
-      return -1;
-    }
-  } else if (c == 'd') {
-    if ((out = fopen("DecryptedFile", "w")) == NULL) {
-      printf("Erreur création du fichier !");
-      return -1;
-    }
-  } else {
-    printf("Erreur de saisie\n");
-    return -1;
-  }
-
-  init = 0;
-  int met = 1;
-  do {
-    if (init) {
-      printf("Désolée mais cette méthode n'existe pas \n");
-    }
-    printf("Quelle méthode voulez-vous utiliser ? (1, 2 ou 3) : ");
-    scanf("%d", &met);
-    while((d = getchar()) != '\n' && d != EOF);
-    init = 1;
-  } while(met < 1 && met > 3);
-
-  if (c == 'e') {
-    EncryptFile(in, out, met);
-  } else if (c == 'd') {
-    DecryptFile(in, out, met);
-  } else {
-    printf("Erreur de saisie\n");
-    return -1;
-  }
-
-  fclose(in);
-  fclose(out);
-
+  } while (!stop);
   return 1;
 }
 
@@ -141,8 +235,11 @@ void EncryptFile(FILE *in, FILE *out, int methode){
       break;
 
     case 3:
-      printf("Entrer votre clef secrète : ");
+      printf("\nEntrer votre clef secrète : ");
       scanf("%s", cle);
+      while((d = getchar()) != '\n' && d != EOF);
+      LUT(lut,cle);
+      AfficheLUT(lut);
       break;
   }
 
@@ -216,6 +313,7 @@ void DecryptFile(FILE *in, FILE *out, int methode){
     case 3:
       printf("Entrer votre clef secrète : ");
       scanf("%s", cle);
+      while((d = getchar()) != '\n' && d != EOF);
       break;
   }
 
@@ -249,27 +347,20 @@ void DecryptFile(FILE *in, FILE *out, int methode){
 }
 
 void LUT(char lut[2][26], char *cle){
-    int j = 0, k = -1;
-    for(; cle[j] != '\0'; j++){
-        lut[1][j] = cle[j];
-    }
-    int bool;
-    for(int i = j-1; i < 26+k; i++){
-        bool = 1;
-        for(int n = 0; cle[n] != '\0'; n++){
-            if (cle[n] == lut[0][i-(j-1)])
-            {
-                bool = 0;
-            }
-        }
-        if (bool)
-        {
-            lut[1][i-k] = lut[0][i-(j-1)];
-        }else
-        {
-            k++;
-        }
-    }
+	int taille;
+	int i,j,k,l;
+
+	for(i = 0; cle[i] != '\0' ; i++);
+	taille = i;
+
+	for(j = 0 ; j < taille ; j++){lut[1][j] = cle[j];}
+	for(k = 0; k < 26 ; k++){
+		for(l = 0; (lut[0][k] != lut[1][l]) &&  (l < taille) ; l++);
+		if(l == taille){
+			lut[1][taille] = lut[0][k];
+			taille = taille + 1;
+		}
+	}
 }
 
 void AfficheLUT(char lut[2][26]){
