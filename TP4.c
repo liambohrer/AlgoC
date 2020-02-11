@@ -18,9 +18,6 @@ int main(){
   char str[100], filePath[100];
   FILE *in, *out;
 
-  //printf("Entrer une phrase : ");
-  //scanf("%50[^\n]", str);
-
   char d, c;
   int init = 0, stop = 0;
 
